@@ -1,3 +1,5 @@
+#include <stdbool.h> // TODO: make this not be needed
+
 #include <msp430.h>
 #include <stdlib.h>
 #include <string.h>
