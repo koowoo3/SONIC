@@ -19,8 +19,12 @@ RUN tar -xjf msp430-gcc-7.3.0.9_linux64.tar.bz2 -C /opt/ti/
 RUN rm -f msp430-gcc-7.3.0.9_linux64.tar.bz2
 RUN mv /opt/ti/msp430-gcc-7.3.0.9_linux64/ /opt/ti/mspgcc/
 
+# fix the lack of stdbool.h include in msp430.h
+RUN sed -i '1s/^/#include <stdbool.h>/' /opt/ti/mspgcc/lib/gcc/msp430-elf/7.3.0/plugin/include/config/msp430/msp430.h
+
 
 RUN git clone --recursive https://github.com/wpineth/SONIC
+
 
 # RUN export CPATH="/opt/ti/mspgcc/lib/gcc/msp430-elf/7.3.0/plugin/include/config/msp430/:$CPATH"
 

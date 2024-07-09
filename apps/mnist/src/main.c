@@ -1,4 +1,4 @@
-#include <stdbool.h> // TODO: make this not be needed
+#define __MSP430FR5994__
 
 #include <msp430.h>
 #include <stdlib.h>
