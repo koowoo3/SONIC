@@ -15,6 +15,32 @@ RUN apt-get install build-essential -y
 
 RUN apt-get install unzip -y
 
+RUN apt-get install libusb-0.1-4 -y
+RUN apt-get install libc6 -y
+
+RUN wget http://security.ubuntu.com/ubuntu/pool/main/n/ncurses/libtinfo6_6.2-0ubuntu2.1_amd64.deb
+RUN dpkg -i libtinfo6_6.2-0ubuntu2.1_amd64.deb
+RUN rm -f libtinfo6_6.2-0ubuntu2.1_amd64.deb
+
+RUN wget http://mirrors.kernel.org/ubuntu/pool/main/r/readline/libreadline8_8.0-4_amd64.deb
+RUN dpkg -i libreadline8_8.0-4_amd64.deb
+RUN rm -f libreadline8_8.0-4_amd64.deb
+
+RUN apt-get install alien -y
+
+RUN wget http://mirrors.kernel.org/ubuntu/pool/universe/m/mspdebug/mspdebug_0.22-2build2_amd64.deb
+RUN dpkg -i mspdebug_0.22-2build2_amd64.deb
+RUN rm -f mspdebug_0.22-2build2_amd64.deb
+
+RUN wget https://dr-download.ti.com/software-development/software-programming-tool/MD-szn5bCveqt/1.03.20.00/MSPFlasher-1_03_20_00-linux-x64-installer.zip
+RUN unzip MSPFlasher-1_03_20_00-linux-x64-installer.zip -d /MSPFlasher-1_03_20_00-linux-x64-installer/
+RUN chmod +x /MSPFlasher-1_03_20_00-linux-x64-installer/MSPFlasher-1.3.20-linux-x64-installer.run
+RUN ./MSPFlasher-1_03_20_00-linux-x64-installer/MSPFlasher-1.3.20-linux-x64-installer.run --mode unattended
+RUN mv /root/ti/MSPFlasher_1.3.20/libmsp430.so /usr/lib/
+RUN rm -f MSPFlasher-1_03_20_00-linux-x64-installer.zip
+RUN rm -rf /MSPFlasher-1_03_20_00-linux-x64-installer/
+RUN rm -rf /root/ti/
+
 RUN wget https://software-dl.ti.com/msp430/msp430_public_sw/mcu/msp430/MSPGCC/6_00_00_900/exports/msp430-gcc-7.3.0.9_linux64.tar.bz2
 RUN mkdir /opt/ti/
 RUN tar -xjf msp430-gcc-7.3.0.9_linux64.tar.bz2 -C /opt/ti/
@@ -22,7 +48,6 @@ RUN rm -f msp430-gcc-7.3.0.9_linux64.tar.bz2
 RUN mv /opt/ti/msp430-gcc-7.3.0.9_linux64/ /opt/ti/mspgcc/
 
 RUN wget https://software-dl.ti.com/msp430/msp430_public_sw/mcu/msp430/MSPGCC/6_00_00_900/exports/msp430-gcc-support-files-1.204.zip
-RUN mkdir /msp430-gcc-support-files-1.204/
 RUN unzip msp430-gcc-support-files-1.204.zip -d /msp430-gcc-support-files-1.204/
 RUN mv /msp430-gcc-support-files-1.204/msp430-gcc-support-files/include/* /opt/ti/mspgcc/include
 RUN rm -f msp430-gcc-support-files-1.204.zip
@@ -31,11 +56,20 @@ RUN rm -rf /msp430-gcc-support-files-1.204/
 # fix the lack of stdbool.h include in msp430.h
 RUN sed -i '1s/^/#include <stdbool.h>/' /opt/ti/mspgcc/lib/gcc/msp430-elf/7.3.0/plugin/include/config/msp430/msp430.h
 
+RUN echo $'/opt/ti/mspgcc/libexec/gcc/msp430-elf/7.3.0/\n\
+/opt/ti/mspgcc/lib/gcc/msp430-elf/7.3.0/plugin/\n\
+/opt/ti/mspgcc/lib64/' > /etc/ld.so.conf.d/ti.
 
 RUN git clone --recursive https://github.com/wpineth/SONIC
 
 
-# RUN export CPATH="/opt/ti/mspgcc/lib/gcc/msp430-elf/7.3.0/plugin/include/config/msp430/:$CPATH"
+
+
+# util
+RUN apt-get install usbutils -y
+
+
+
 
 # RUN cd ./SONIC
 
@@ -43,7 +77,17 @@ RUN git clone --recursive https://github.com/wpineth/SONIC
 # RUN CPATH="/opt/ti/mspgcc/lib/gcc/msp430-elf/7.3.0/plugin/include/config/msp430/:$CPATH" make apps/mnist/bld/gcc/dep
 # RUN CPATH="/opt/ti/mspgcc/lib/gcc/msp430-elf/7.3.0/plugin/include/config/msp430/:$CPATH" make apps/mnist/bld/gcc/all BACKEND=sonic
 
+
+# CPATH="/opt/ti/mspgcc/lib/gcc/msp430-elf/7.3.0/plugin/include/config/msp430/:$CPATH" make apps/mnist/bld/gcc/depclean
+# CPATH="/opt/ti/mspgcc/lib/gcc/msp430-elf/7.3.0/plugin/include/config/msp430/:$CPATH" make apps/mnist/bld/gcc/dep
+# CPATH="/opt/ti/mspgcc/lib/gcc/msp430-elf/7.3.0/plugin/include/config/msp430/:$CPATH" make apps/mnist/bld/gcc/all BACKEND=sonic
+
 # RUN gcc -v
 
 # docker build -t sonic .
 # docker run -it sonic
+# docker build -t sonic . && docker run -it sonic
+
+# mspdebug -v 3300 -d /dev/ttyACM0 tilib
+
+# docker run --privileged -it sonic
