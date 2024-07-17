@@ -26,11 +26,9 @@ RUN wget http://mirrors.kernel.org/ubuntu/pool/main/r/readline/libreadline8_8.0-
 RUN dpkg -i libreadline8_8.0-4_amd64.deb
 RUN rm -f libreadline8_8.0-4_amd64.deb
 
-RUN apt-get install alien -y
-
-RUN wget http://mirrors.kernel.org/ubuntu/pool/universe/m/mspdebug/mspdebug_0.22-2build2_amd64.deb
-RUN dpkg -i mspdebug_0.22-2build2_amd64.deb
-RUN rm -f mspdebug_0.22-2build2_amd64.deb
+RUN wget http://mirrors.kernel.org/ubuntu/pool/universe/m/mspdebug/mspdebug_0.22-2build1_amd64.deb
+RUN dpkg -i mspdebug_0.22-2build1_amd64.deb
+RUN rm -f mspdebug_0.22-2build1_amd64.deb
 
 RUN wget https://dr-download.ti.com/software-development/software-programming-tool/MD-szn5bCveqt/1.03.20.00/MSPFlasher-1_03_20_00-linux-x64-installer.zip
 RUN unzip MSPFlasher-1_03_20_00-linux-x64-installer.zip -d /MSPFlasher-1_03_20_00-linux-x64-installer/
@@ -58,7 +56,12 @@ RUN sed -i '1s/^/#include <stdbool.h>/' /opt/ti/mspgcc/lib/gcc/msp430-elf/7.3.0/
 
 RUN echo $'/opt/ti/mspgcc/libexec/gcc/msp430-elf/7.3.0/\n\
 /opt/ti/mspgcc/lib/gcc/msp430-elf/7.3.0/plugin/\n\
-/opt/ti/mspgcc/lib64/' > /etc/ld.so.conf.d/ti.
+/opt/ti/mspgcc/lib64/' > /etc/ld.so.conf.d/ti.conf
+
+
+RUN echo $'\n\
+\n\
+export CPATH="/opt/ti/mspgcc/lib/gcc/msp430-elf/7.3.0/plugin/include/config/msp430/:$CPATH"' > ~/.bashrc
 
 RUN git clone --recursive https://github.com/wpineth/SONIC
 
@@ -73,14 +76,14 @@ RUN apt-get install usbutils -y
 
 # RUN cd ./SONIC
 
-# RUN CPATH="/opt/ti/mspgcc/lib/gcc/msp430-elf/7.3.0/plugin/include/config/msp430/:$CPATH" make apps/mnist/bld/gcc/depclean
-# RUN CPATH="/opt/ti/mspgcc/lib/gcc/msp430-elf/7.3.0/plugin/include/config/msp430/:$CPATH" make apps/mnist/bld/gcc/dep
-# RUN CPATH="/opt/ti/mspgcc/lib/gcc/msp430-elf/7.3.0/plugin/include/config/msp430/:$CPATH" make apps/mnist/bld/gcc/all BACKEND=sonic
+# RUN make apps/mnist/bld/gcc/depclean
+# RUN make apps/mnist/bld/gcc/dep
+# RUN make apps/mnist/bld/gcc/all BACKEND=sonic
 
 
-# CPATH="/opt/ti/mspgcc/lib/gcc/msp430-elf/7.3.0/plugin/include/config/msp430/:$CPATH" make apps/mnist/bld/gcc/depclean
-# CPATH="/opt/ti/mspgcc/lib/gcc/msp430-elf/7.3.0/plugin/include/config/msp430/:$CPATH" make apps/mnist/bld/gcc/dep
-# CPATH="/opt/ti/mspgcc/lib/gcc/msp430-elf/7.3.0/plugin/include/config/msp430/:$CPATH" make apps/mnist/bld/gcc/all BACKEND=sonic
+# make apps/mnist/bld/gcc/depclean
+# make apps/mnist/bld/gcc/dep
+# make apps/mnist/bld/gcc/all BACKEND=sonic
 
 # RUN gcc -v
 
@@ -89,5 +92,7 @@ RUN apt-get install usbutils -y
 # docker build -t sonic . && docker run -it sonic
 
 # mspdebug -v 3300 -d /dev/ttyACM0 tilib
+# prog apps/mnist/bld/gcc/mnist.out
+# run
 
-# docker run --privileged -it sonic
+# docker build -t sonic . && docker run --privileged -it sonic
