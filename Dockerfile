@@ -2,19 +2,14 @@
 FROM ubuntu:18.04 as base
 
 RUN apt-get update
-
 RUN apt-get install git -y
-
 RUN apt-get install curl -y
-
 RUN apt-get install wget -y
-
 RUN apt-get install bzip2 -y
-
 RUN apt-get install build-essential -y
-
 RUN apt-get install unzip -y
-
+RUN apt-get install bc -y
+RUN apt-get install screen -y
 RUN apt-get install libusb-0.1-4 -y
 RUN apt-get install libc6 -y
 
@@ -26,9 +21,9 @@ RUN wget http://mirrors.kernel.org/ubuntu/pool/main/r/readline/libreadline8_8.0-
 RUN dpkg -i libreadline8_8.0-4_amd64.deb
 RUN rm -f libreadline8_8.0-4_amd64.deb
 
-RUN wget http://mirrors.kernel.org/ubuntu/pool/universe/m/mspdebug/mspdebug_0.22-2build1_amd64.deb
-RUN dpkg -i mspdebug_0.22-2build1_amd64.deb
-RUN rm -f mspdebug_0.22-2build1_amd64.deb
+RUN wget https://mirrors.edge.kernel.org/ubuntu/pool/universe/m/mspdebug/mspdebug_0.22-2build2_amd64.deb
+RUN dpkg -i mspdebug_0.22-2build2_amd64.deb
+RUN rm -f mspdebug_0.22-2build2_amd64.deb
 
 RUN wget https://dr-download.ti.com/software-development/software-programming-tool/MD-szn5bCveqt/1.03.20.00/MSPFlasher-1_03_20_00-linux-x64-installer.zip
 RUN unzip MSPFlasher-1_03_20_00-linux-x64-installer.zip -d /MSPFlasher-1_03_20_00-linux-x64-installer/
@@ -52,7 +47,7 @@ RUN rm -f msp430-gcc-support-files-1.204.zip
 RUN rm -rf /msp430-gcc-support-files-1.204/
 
 # fix the lack of stdbool.h include in msp430.h
-RUN sed -i '1s/^/#include <stdbool.h>/' /opt/ti/mspgcc/lib/gcc/msp430-elf/7.3.0/plugin/include/config/msp430/msp430.h
+# RUN sed -i '1s/^/#include <stdbool.h>/' /opt/ti/mspgcc/lib/gcc/msp430-elf/7.3.0/plugin/include/config/msp430/msp430.h
 
 RUN echo $'/opt/ti/mspgcc/libexec/gcc/msp430-elf/7.3.0/\n\
 /opt/ti/mspgcc/lib/gcc/msp430-elf/7.3.0/plugin/\n\
@@ -85,14 +80,29 @@ RUN apt-get install usbutils -y
 # make apps/mnist/bld/gcc/dep
 # make apps/mnist/bld/gcc/all BACKEND=sonic
 
-# RUN gcc -v
+# make apps/mnist/bld/gcc/depclean CONSOLE=1
+# make apps/mnist/bld/gcc/dep CONSOLE=1
+# make apps/mnist/bld/gcc/all BACKEND=sonic CONSOLE=1
 
-# docker build -t sonic .
-# docker run -it sonic
-# docker build -t sonic . && docker run -it sonic
 
-# mspdebug -v 3300 -d /dev/ttyACM0 tilib
+
+
+
+# Terminal 1
+
+# sudo docker build -t sonic . && sudo docker run --privileged -it sonic
+
+# cd ./SONIC
+# make apps/mnist/bld/gcc/depclean CONSOLE=1
+# make apps/mnist/bld/gcc/dep CONSOLE=1
+# make apps/mnist/bld/gcc/all BACKEND=sonic CONSOLE=1
+# mspdebug -v 3300 -d /dev/ttyACM1 tilib
+
 # prog apps/mnist/bld/gcc/mnist.out
 # run
 
-# docker build -t sonic . && docker run --privileged -it sonic
+# Terminal 2
+
+# sudo docker ps
+# sudo docker exec -it <container> bash
+# screen /dev/ttyACM1 115200
