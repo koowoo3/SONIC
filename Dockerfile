@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM ubuntu:18.04 as base
+FROM ubuntu:20.04 as base
 
 RUN apt-get update
 RUN apt-get install git -y
